@@ -23,6 +23,11 @@ templates:
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
 
+consumes:
+- name: elasticsearch
+  type: elasticsearch
+  optional: true
+
 properties:
   elastalert.env.http_proxy:
     description: "HTTP proxy"

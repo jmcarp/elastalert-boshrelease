@@ -12,12 +12,29 @@ run_every:
 buffer_time:
   minutes: <%= p("elastalert.buffer_time.minutes") %>
 
+<%
+  es_host = nil
+  es_port = nil
+
+  if_link('elasticsearch') do |link|
+    es_host = link.instances.first.address
+    es_port = link.p('elasticsearch.port')
+  end
+
+  unless es_host
+    es_host = p('elastalert.elasticsearch.host')
+  end
+  unless es_port
+    es_port = p('elastalert.elasticsearch.port')
+  end
+%>
+
 # The elasticsearch hostname for metadata writeback
 # Note that every rule can have its own elasticsearch host
-es_host: <%= p("elastalert.elasticsearch.host") %>
+es_host: <%= es_host %>
 
 # The elasticsearch port
-es_port: <%= p("elastalert.elasticsearch.port") %>
+es_port: <%= es_port %>
 
 # The index on es_host which is used for metadata storage
 # This can be a unmapped index, but it is recommended that you run

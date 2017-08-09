@@ -31,8 +31,24 @@ export EA_BIN=/var/vcap/packages/elastalert/bin
 export PYTHONPATH=/var/vcap/packages/elastalert/lib/python2.7/site-packages
 
 # elasticsearch hostname / IP and port number
-export ES_HOST='<%= p("elastalert.elasticsearch.host") %>'
-export ES_PORT='<%= p("elastalert.elasticsearch.port") %>'
+<%
+  es_host = nil
+  es_port = nil
+
+  if_link('elasticsearch') do |link|
+    es_host = link.instances.first.address
+    es_port = link.p('elasticsearch.port')
+  end
+
+  unless es_host
+    es_host = p('elastalert.elasticsearch.host')
+  end
+  unless es_port
+    es_port = p('elastalert.elasticsearch.port')
+  end
+%>
+export ES_HOST='<%= es_host %>'
+export ES_PORT='<%= es_port %>'
 
 # which rules to apply
 <% if_p("elastalert.rules.any.index") do |any| %>cp /var/vcap/jobs/elastalert/data/draft_rules/any.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
