@@ -35,16 +35,13 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/var/vcap/packages/python/lib
 export ES_HOST='<%= p("elastalert.elasticsearch.host") %>'
 export ES_PORT='<%= p("elastalert.elasticsearch.port") %>'
 
-# which rules to apply
-<% if_p("elastalert.rules.any.index") do |any| %>cp /var/vcap/jobs/elastalert/data/draft_rules/any.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.change.index") do |change| %>cp /var/vcap/jobs/elastalert/data/draft_rules/change.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.frequency.index") do |frequency| %>cp /var/vcap/jobs/elastalert/data/draft_rules/frequency.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.spike.index") do |spike| %>cp /var/vcap/jobs/elastalert/data/draft_rules/spike.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.flatline.index") do |flatline| %>cp /var/vcap/jobs/elastalert/data/draft_rules/flatline.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.new_term.index") do |new_term| %>cp /var/vcap/jobs/elastalert/data/draft_rules/new_term.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.cardinality.index") do |cardinality| %>cp /var/vcap/jobs/elastalert/data/draft_rules/cardinality.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.blacklist.index") do |blacklist| %>cp /var/vcap/jobs/elastalert/data/draft_rules/blacklist.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
-<% if_p("elastalert.rules.whitelist.index") do |whitelist| %>cp /var/vcap/jobs/elastalert/data/draft_rules/whitelist.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
+<% common = p('elastalert.rules.common') %>
+
+<% p('elastalert.rules.rules').each do |rule| %>
+cat << 'EOF' > /var/vcap/jobs/elastalert/data/rules/<%= rule['name'] %>.yaml
+<%= common.merge(rule['content']).to_yaml %>
+EOF
+<% end %>
 
 # create elastalert index in elasticsearch
 set +e  # don't block shutdown if elastic is unavailable
