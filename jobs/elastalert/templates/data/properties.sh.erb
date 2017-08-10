@@ -29,6 +29,7 @@ export EA_BIN=/var/vcap/packages/elastalert/bin
 
 # elastalert python packages
 export PYTHONPATH=/var/vcap/packages/elastalert/lib/python2.7/site-packages
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/var/vcap/packages/python/lib
 
 # elasticsearch hostname / IP and port number
 export ES_HOST='<%= p("elastalert.elasticsearch.host") %>'
@@ -46,4 +47,5 @@ export ES_PORT='<%= p("elastalert.elasticsearch.port") %>'
 <% if_p("elastalert.rules.whitelist.index") do |whitelist| %>cp /var/vcap/jobs/elastalert/data/draft_rules/whitelist.yaml /var/vcap/jobs/elastalert/data/rules/ <% end %>
 
 # create elastalert index in elasticsearch
+set +e  # don't block shutdown if elastic is unavailable
 $EA_BIN/elastalert-create-index --host $ES_HOST --port $ES_PORT --index elastalert_status --no-auth --no-ssl --url-prefix "" --old-index None

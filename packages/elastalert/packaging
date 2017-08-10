@@ -1,6 +1,4 @@
-
-set -e # exit immediately if a simple command exits with a non-zero status
-set -u # report the usage of uninitialized variables
+set -ex
 
 # Detect # of CPUs so make jobs can be parallelized
 CPUS=$(grep -c ^processor /proc/cpuinfo)
@@ -9,32 +7,13 @@ CPUS=$(grep -c ^processor /proc/cpuinfo)
 # $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
 export HOME=/var/vcap
 
-# create folders
-mkdir -p $BOSH_INSTALL_TARGET/lib/python2.7/dist-packages
-mkdir -p $BOSH_INSTALL_TARGET/lib/python2.7/site-packages
-
-# python packages
-export PYTHONPATH=$BOSH_INSTALL_TARGET/lib/python2.7/site-packages
+export PATH=/var/vcap/packages/python/bin:$PATH
+export LD_LIBRARY_PATH=/var/vcap/packages/python/lib:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH=/var/vcap/packages/python/include:$C_INCLUDE_PATH
 
 # ubuntu update and install
 apt-get update
-apt-get install -y python-dev build-essential
-
-# install pip
-python elastalert/get-pip.py
-
-# install setuptools
-python elastalert/ez_setup.py
-
-# untar elastalert
-tar xfv elastalert/v0.1.1.tar.gz
-#cp -a elastalert-0.1.1/* $BOSH_INSTALL_TARGET
-#cd $BOSH_INSTALL_TARGET
-cd elastalert-0.1.1
+apt-get install -y build-essential libffi-dev
 
 # install elastalert
-python -v setup.py install --prefix=$BOSH_INSTALL_TARGET
-pip install -r requirements.txt --target $PYTHONPATH
-
-# Alternatively, to copy archive contents:
-# cp -a elastalert-0.1.1/* $BOSH_INSTALL_TARGET
+pip install elastalert==0.1.18 --prefix $BOSH_INSTALL_TARGET

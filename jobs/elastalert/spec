@@ -3,6 +3,7 @@ name: elastalert
 
 packages:
 - elastalert
+- python
 
 templates:
   data/draft_rules/any.yaml.erb: data/draft_rules/any.yaml
